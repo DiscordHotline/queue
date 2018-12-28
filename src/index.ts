@@ -147,10 +147,6 @@ async function handleReport(
         }
 
         if (response.status !== subscription.expectedResponseCode) {
-            if (attempt >= 5) {
-                return false;
-            }
-
             console.warn('Subscription did not respond as expected. Attempt: ' + attempt, subscription);
             setTimeout(
                 () => channel.publish(
