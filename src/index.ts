@@ -10,13 +10,14 @@ import {Vault} from './Vault';
 let vault: Vault;
 let api: AxiosInstance;
 let channel: Channel;
+const cdn = 'https://cdn.discordapp.com';
 
-const actionToType: {[key: string]: interfaces.MessageType} = {
+const actionToType: { [key: string]: interfaces.MessageType }   = {
     new:    'NEW_REPORT',
     edit:   'EDIT_REPORT',
     delete: 'DELETE_REPORT',
 };
-const typeToAction: { [key: string]: interfaces.MessageAction }  = {
+const typeToAction: { [key: string]: interfaces.MessageAction } = {
     NEW_REPORT:    'new',
     EDIT_REPORT:   'edit',
     DELETE_REPORT: 'delete',
@@ -34,9 +35,9 @@ async function main(): Promise<void> {
     api         = axios.create({
         baseURL: process.env.API_URL || 'https://api.hotline.gg',
         headers: {
-            Authorization:  'Bearer ' + queue.api_key,
-            'Accepts':      'application/json',
-            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + queue.api_key,
+            'Accepts':       'application/json',
+            'Content-Type':  'application/json',
         },
     });
 
@@ -135,7 +136,7 @@ async function handleReport(
             hook.setOptions({link: subscription.url})
                 .setPayload({
                     username:   'Watcher',
-                    avatar_url: 'https://cdn.discordapp.com/avatars/305140278480863233/51daf8a9e8c786dc59f3587999fe5948.webp?size=256',
+                    avatar_url: `${cdn}/avatars/305140278480863233/51daf8a9e8c786dc59f3587999fe5948.webp?size=256`,
                     embeds:     [await getEmbed(report, true)],
                 });
 

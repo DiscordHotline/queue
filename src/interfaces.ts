@@ -3,7 +3,7 @@ export type MessageAction = 'new' | 'edit' | 'delete';
 
 export interface Message {
     type: MessageType;
-    data: NewReportData | EditReportData | DeleteReportData | SpecificSubscriptionReport;
+    data: ReportData | SpecificSubscriptionReport;
 }
 
 export interface Report {
