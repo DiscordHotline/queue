@@ -147,14 +147,18 @@ async function handleReport(
             response        = await hook.fire();
             response.status = response.statusCode;
         } else {
-            response = await axios.post(
-                subscription.url,
-                {
-                    embed:  JSON.stringify(await getEmbed(report, true)),
-                    report: JSON.stringify(report),
-                    action,
-                },
-            );
+            try {
+                response = await axios.post(
+                    subscription.url,
+                    {
+                        embed:  JSON.stringify(await getEmbed(report, true)),
+                        report: JSON.stringify(report),
+                        action,
+                    },
+                );
+            } catch (e) {
+                response = e.response;
+            }
         }
 
         if (response.status !== subscription.expectedResponseCode) {
