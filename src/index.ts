@@ -115,9 +115,13 @@ async function handleReport(
     }
     let subscriptions: Subscription[];
     if (subscriptionId) {
-        subscriptions = [
-            (await api.get<interfaces.Subscription>('/subscription/' + subscriptionId)).data,
-        ];
+        try {
+            subscriptions = [
+                (await api.get<interfaces.Subscription>('/subscription/' + subscriptionId)).data,
+            ];
+        } catch (e) {
+            return false;
+        }
     } else {
         subscriptions = (await api.get<interfaces.SubscriptionSearchResults>(url)).data.results;
     }
