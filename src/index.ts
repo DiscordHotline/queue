@@ -42,14 +42,18 @@ async function main(): Promise<void> {
     });
 
     const connection = await connect({
-        hostname: queue.host,
-        port:     parseInt(queue.port, 10),
-        username: queue.username,
-        password: queue.password,
-        vhost:    'hotline',
+        hostname:  queue.host,
+        port:      parseInt(queue.port, 10),
+        username:  queue.username,
+        password:  queue.password,
+        vhost:     'hotline',
+        heartbeat: 5,
     });
 
     channel = await connection.createChannel();
+    await channel.assertExchange('hotline-reports', 'direct', {durable: true});
+    await channel.assertQueue('hotline-reports', {durable: true});
+    await channel.bindQueue('hotline-reports', 'hotline-reports', 'report');
 
     console.log('Consuming messages');
     await channel.consume('hotline-reports', async (msg: AMQPMessage) => {
