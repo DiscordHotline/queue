@@ -1,5 +1,8 @@
+export type MessageType = 'NEW_REPORT' | 'DELETE_REPORT' | 'EDIT_REPORT' | 'NEW_REPORT_FOR_SUBSCRIPTION';
+export type MessageAction = 'new' | 'edit' | 'delete';
+
 export interface Message {
-    type: 'NEW_REPORT' | 'DELETE_REPORT' | 'EDIT_REPORT' | 'NEW_REPORT_FOR_SUBSCRIPTION';
+    type: MessageType;
     data: NewReportData | EditReportData | DeleteReportData | SpecificSubscriptionReport;
 }
 
@@ -21,17 +24,9 @@ export interface SpecificSubscriptionReport {
     attempt?: number;
 }
 
-export interface NewReportData extends SpecificSubscriptionReport{
+export interface ReportData extends SpecificSubscriptionReport {
+    id?: number;
     report: Report;
-}
-
-export interface EditReportData extends SpecificSubscriptionReport{
-    id: number;
-    report: Report;
-}
-
-export interface DeleteReportData extends SpecificSubscriptionReport{
-    id: number;
 }
 
 export interface User {

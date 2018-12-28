@@ -11,6 +11,17 @@ let vault: Vault;
 let api: AxiosInstance;
 let channel: Channel;
 
+const actionToType: {[key: string]: interfaces.MessageType} = {
+    new:    'NEW_REPORT',
+    edit:   'EDIT_REPORT',
+    delete: 'DELETE_REPORT',
+};
+const typeToAction: { [key: string]: interfaces.MessageAction }  = {
+    NEW_REPORT:    'new',
+    EDIT_REPORT:   'edit',
+    DELETE_REPORT: 'delete',
+};
+
 async function main(): Promise<void> {
     vault = new Vault({
         address:  process.env.VAULT_ADDR,
@@ -61,12 +72,13 @@ async function onMessage(message: interfaces.Message) {
     switch (message.type) {
         case 'EDIT_REPORT':
         case 'NEW_REPORT':
-            const data   = message.data as interfaces.NewReportData;
+        case 'DELETE_REPORT':
+            const data   = message.data as interfaces.ReportData;
             const report = data.report as Report;
 
-            return await handleNewReport(
+            return await handleReport(
+                typeToAction[message.type],
                 report,
-                message.type === 'NEW_REPORT' ? 'new' : 'edit',
                 data.subscription,
                 data.attempt,
             );
@@ -88,9 +100,9 @@ async function onMessage(message: interfaces.Message) {
  * 2. Filter out subscriptions that don't match this report
  * 3. Send out report to remaining subscriptions
  */
-async function handleNewReport(
+async function handleReport(
+    action: interfaces.MessageAction,
     report: Report,
-    action: 'new' | 'edit',
     subscriptionId?: number,
     attempt: number = 0,
 ): Promise<boolean> {
@@ -113,6 +125,11 @@ async function handleNewReport(
 
         // We cannot/will not edit a webhook. Just post a new one.
         if (subscription.discordWebhook) {
+            if (action === 'delete') {
+                // Can't / Wont delete a webhook
+                continue;
+            }
+
             subscription.expectedResponseCode = 204;
             const hook                        = new hookcord.Hook();
             hook.setOptions({link: subscription.url})
@@ -125,10 +142,7 @@ async function handleNewReport(
             response        = await hook.fire();
             response.status = response.statusCode;
         } else {
-            response = await axios.post(subscription.url, {
-                report: JSON.stringify(report),
-                action,
-            });
+            response = await axios.post(subscription.url, {report: JSON.stringify(report), action});
         }
 
         if (response.status !== subscription.expectedResponseCode) {
@@ -138,15 +152,22 @@ async function handleNewReport(
 
             console.warn('Subscription did not respond as expected. Attempt: ' + attempt, subscription);
             setTimeout(
-                () => channel.publish('hotline-reports', 'report', Buffer.from(JSON.stringify({
-                    type: action === 'new' ? 'NEW_REPORT' : 'EDIT_REPORT',
-                    data: {
-                              subscription: subscription.id,
-                              attempt:      attempt + 1,
-                              report,
-                          } as interfaces.SpecificSubscriptionReport,
-                }))),
-                5 * 60 * 1000
+                () => channel.publish(
+                    'hotline-reports',
+                    'report',
+                    Buffer.from(
+                        JSON.stringify({
+                                type: actionToType[action],
+                                data: {
+                                          subscription: subscription.id,
+                                          attempt:      attempt + 1,
+                                          report,
+                                      } as interfaces.SpecificSubscriptionReport,
+                            },
+                        ),
+                    ),
+                ),
+                5 * 60 * 1000,
             );
         } else {
             console.log(`Subscription posted successfully. Subscription: ${subscription.id} Report: ${report.id}`);
