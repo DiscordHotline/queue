@@ -28,6 +28,6 @@ deploy:
   stage: deploy
   image: cdrx/rancher-gitlab-deploy
   script:
-    - upgrade --environment production --stack hotline --service bot
+    - upgrade --environment production --stack hotline --service queue
   only:
     - master
