@@ -4,7 +4,6 @@ import * as hookcord from 'hookcord';
 import * as moment from 'moment';
 
 import * as interfaces from './interfaces';
-import {Report, Subscription} from './interfaces';
 import {Vault} from './Vault';
 
 let vault: Vault;
@@ -72,14 +71,14 @@ async function main(): Promise<void> {
 }
 
 async function onMessage(message: interfaces.Message) {
-    console.log('Processing message: ' + message.type);
+    console.log('Processing message: ' + message.type, message.data);
 
     switch (message.type) {
         case 'EDIT_REPORT':
         case 'NEW_REPORT':
         case 'DELETE_REPORT':
             const data   = message.data as interfaces.ReportData;
-            const report = data.report as Report;
+            const report = data.report as interfaces.Report;
 
             return await handleReport(
                 typeToAction[message.type],
@@ -107,7 +106,7 @@ async function onMessage(message: interfaces.Message) {
  */
 async function handleReport(
     action: interfaces.MessageAction,
-    report: Report,
+    report: interfaces.Report,
     subscriptionId?: number,
     attempt: number = 0,
 ): Promise<boolean> {
@@ -117,7 +116,7 @@ async function handleReport(
     } else {
         url += '?tags=20';
     }
-    let subscriptions: Subscription[];
+    let subscriptions: interfaces.Subscription[];
     if (subscriptionId) {
         try {
             subscriptions = [
@@ -186,7 +185,7 @@ async function handleReport(
                 5 * 60 * 1000,
             );
         } else {
-            console.log(`Subscription posted successfully. Subscription: ${subscription.id} Report: ${report.id}`);
+            console.log(`Subscription posted successfully. Subscription: ${subscription.id} Report: `, report);
         }
     }
 
