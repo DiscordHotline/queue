@@ -61,6 +61,7 @@ async function main(): Promise<void> {
         console.log(`Processing message: ${message.type} Delay: ${message.waitUntil}`);
         if (message.waitUntil && moment().isBefore(moment(message.waitUntil))) {
             console.log('Delaying');
+
             return setTimeout(() => channel.nack(msg, false, true), 30 * 1000);
         }
 
@@ -175,7 +176,8 @@ async function handleReport(
 
         if (!response || response.status !== subscription.expectedResponseCode) {
             console.warn(
-                `Subscription did not respond as expected. Received: ${response ? response.status : 0} Attempt: ${attempt}`,
+                'Subscription did not respond as expected.',
+                `Received: ${response ? response.status : 0} Attempt: ${attempt}`,
                 subscription,
             );
             const dataToSend = {
