@@ -58,6 +58,7 @@ async function main(): Promise<void> {
     console.log('Consuming messages');
     await channel.consume('hotline-reports', async (msg: AMQPMessage) => {
         const message: interfaces.Message = JSON.parse(msg.content.toString());
+        console.log(`Processing message: ${message.type} Delay: ${message.delay}`);
         if (message.delay && moment().isAfter(moment(message.delay))) {
             return setTimeout(() => channel.nack(msg, false, true), 15 * 1000);
         }
@@ -77,8 +78,6 @@ async function main(): Promise<void> {
 }
 
 async function onMessage(message: interfaces.Message): Promise<boolean> {
-    console.log('Processing message: ' + message.type, message.data);
-
     switch (message.type) {
         case 'EDIT_REPORT':
         case 'NEW_REPORT':
@@ -186,7 +185,7 @@ async function handleReport(
             };
             channel.publish('hotline-reports', 'report', Buffer.from(JSON.stringify(dataToSend)));
         } else {
-            console.log(`Subscription posted successfully. Subscription: ${subscription.id} Report: `, report);
+            console.log(`Subscription posted successfully. Subscription: ${subscription.id} Report: ${report.id}`);
         }
     }
 
