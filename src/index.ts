@@ -24,10 +24,10 @@ const typeToAction: { [key: string]: interfaces.MessageAction } = {
 
 async function main(): Promise<void> {
     vault = new Vault({
-        address  : process.env.VAULT_ADDR,
-        roleId   : process.env.VAULT_ROLE_ID,
-        secretId : process.env.VAULT_SECRET_ID,
-        vaultFile: process.env.VAULT_FILE
+        address:   process.env.VAULT_ADDR,
+        roleId:    process.env.VAULT_ROLE_ID,
+        secretId:  process.env.VAULT_SECRET_ID,
+        vaultFile: process.env.VAULT_FILE,
     });
     await vault.initialize();
 
@@ -171,7 +171,10 @@ async function handleReport(
         }
 
         if (response.status !== subscription.expectedResponseCode) {
-            console.warn('Subscription did not respond as expected. Attempt: ' + attempt, subscription);
+            console.warn(
+                `Subscription did not respond as expected. Received: ${response.status} Attempt: ${attempt}`,
+                subscription,
+            );
             const dataToSend = {
                 waitUntil: moment().add(5, 'm').toDate(),
                 type:      actionToType[action],
