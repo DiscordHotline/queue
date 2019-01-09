@@ -56,8 +56,13 @@ async function main(): Promise<void> {
 
     console.log('Consuming messages');
     await channel.consume('hotline-reports', async (msg: AMQPMessage) => {
+        const message: interfaces.Message = JSON.parse(msg.content.toString());
+        if (message.delay && moment().isBefore(moment(message.delay))) {
+            return setTimeout(() => channel.nack(msg, false, true), 15 * 1000);
+        }
+
         try {
-            if (await onMessage(JSON.parse(msg.content.toString()))) {
+            if (await onMessage(message)) {
                 channel.ack(msg, false);
             } else {
                 channel.nack(msg, false, false);
@@ -70,7 +75,7 @@ async function main(): Promise<void> {
     });
 }
 
-async function onMessage(message: interfaces.Message) {
+async function onMessage(message: interfaces.Message): Promise<boolean> {
     console.log('Processing message: ' + message.type, message.data);
 
     switch (message.type) {
@@ -166,24 +171,16 @@ async function handleReport(
 
         if (response.status !== subscription.expectedResponseCode) {
             console.warn('Subscription did not respond as expected. Attempt: ' + attempt, subscription);
-            setTimeout(
-                () => channel.publish(
-                    'hotline-reports',
-                    'report',
-                    Buffer.from(
-                        JSON.stringify({
-                                type: actionToType[action],
-                                data: {
-                                          subscription: subscription.id,
-                                          attempt:      attempt + 1,
-                                          report,
-                                      } as interfaces.SpecificSubscriptionReport,
-                            },
-                        ),
-                    ),
-                ),
-                5 * 60 * 1000,
-            );
+            const dataToSend = {
+                waitUntil: moment().add(5, 'm').toDate(),
+                type:      actionToType[action],
+                data:      {
+                               subscription: subscription.id,
+                               attempt:      attempt + 1,
+                               report,
+                           } as interfaces.SpecificSubscriptionReport,
+            };
+            channel.publish('hotline-reports', 'report', Buffer.from(JSON.stringify(dataToSend)));
         } else {
             console.log(`Subscription posted successfully. Subscription: ${subscription.id} Report: `, report);
         }
