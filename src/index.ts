@@ -168,13 +168,14 @@ async function handleReport(
                     },
                 );
             } catch (e) {
+                console.log('Error Posting', e);
                 response = e.response;
             }
         }
 
-        if (response.status !== subscription.expectedResponseCode) {
+        if (!response || response.status !== subscription.expectedResponseCode) {
             console.warn(
-                `Subscription did not respond as expected. Received: ${response.status} Attempt: ${attempt}`,
+                `Subscription did not respond as expected. Received: ${response ? response.status : 0} Attempt: ${attempt}`,
                 subscription,
             );
             const dataToSend = {
