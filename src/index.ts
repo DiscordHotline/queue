@@ -58,8 +58,8 @@ async function main(): Promise<void> {
     console.log('Consuming messages');
     await channel.consume('hotline-reports', async (msg: AMQPMessage) => {
         const message: interfaces.Message = JSON.parse(msg.content.toString());
-        console.log(`Processing message: ${message.type} Delay: ${message.delay}`);
-        if (message.delay && moment().isAfter(moment(message.delay))) {
+        console.log(`Processing message: ${message.type} Delay: ${message.waitUntil}`);
+        if (message.waitUntil && moment().isAfter(moment(message.waitUntil))) {
             return setTimeout(() => channel.nack(msg, false, true), 15 * 1000);
         }
 

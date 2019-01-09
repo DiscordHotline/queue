@@ -4,7 +4,7 @@ export type MessageAction = 'new' | 'edit' | 'delete';
 export interface Message {
     type: MessageType;
     data: ReportData | SpecificSubscriptionReport;
-    delay?: Date;
+    waitUntil?: Date;
 }
 
 export interface Report {
