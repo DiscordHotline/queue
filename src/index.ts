@@ -60,17 +60,20 @@ async function main(): Promise<void> {
         const message: interfaces.Message = JSON.parse(msg.content.toString());
         console.log(`Processing message: ${message.type} Delay: ${message.waitUntil}`);
         if (message.waitUntil && moment().isBefore(moment(message.waitUntil))) {
-            return setTimeout(() => channel.nack(msg, false, true), 15 * 1000);
+            console.log('Delaying');
+            return setTimeout(() => channel.nack(msg, false, true), 30 * 1000);
         }
 
         try {
             if (await onMessage(message)) {
+                console.log('Acking Message');
                 channel.ack(msg, false);
             } else {
+                console.log('Nacking Message');
                 channel.nack(msg, false, false);
             }
         } catch (e) {
-            console.error(e);
+            console.error('Nacking Message', e);
 
             channel.nack(msg, false, false);
         }
