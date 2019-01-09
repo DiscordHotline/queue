@@ -24,9 +24,10 @@ const typeToAction: { [key: string]: interfaces.MessageAction } = {
 
 async function main(): Promise<void> {
     vault = new Vault({
-        address:  process.env.VAULT_ADDR,
-        roleId:   process.env.VAULT_ROLE_ID,
-        secretId: process.env.VAULT_SECRET_ID,
+        address  : process.env.VAULT_ADDR,
+        roleId   : process.env.VAULT_ROLE_ID,
+        secretId : process.env.VAULT_SECRET_ID,
+        vaultFile: process.env.VAULT_FILE
     });
     await vault.initialize();
 
