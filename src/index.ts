@@ -70,8 +70,8 @@ async function main(): Promise<void> {
                 console.log('Acking Message');
                 channel.ack(msg, false);
             } else {
-                console.log('Nacking Message');
-                channel.nack(msg, false, false);
+                console.log('Nacking Message, Requeue');
+                channel.nack(msg, false, true);
             }
         } catch (e) {
             console.error('Nacking Message', e);
