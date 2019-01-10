@@ -85,6 +85,10 @@ async function onMessage(message: interfaces.Message): Promise<boolean> {
         case 'EDIT_REPORT':
         case 'NEW_REPORT':
         case 'DELETE_REPORT':
+            if (process.env.DEBUG) {
+                console.log(message);
+            }
+
             const data      = message.data as interfaces.ReportData;
             const report    = data.report as interfaces.Report;
             const oldReport = data.oldReport as interfaces.Report;
