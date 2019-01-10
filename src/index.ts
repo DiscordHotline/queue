@@ -33,7 +33,6 @@ async function main(): Promise<void> {
     await vault.initialize();
 
     const queue = await vault.getSecrets('queue');
-    console.log({queue});
     api         = axios.create({
         baseURL: process.env.API_URL || 'https://api.hotline.gg',
         headers: {
