@@ -166,15 +166,16 @@ async function handleReport(
             response.status = response.statusCode;
         } else {
             try {
-                response = await axios.post(
-                    subscription.url,
-                    {
-                        embed:     stringify(await getEmbed(report, true)),
-                        report:    stringify(report),
-                        oldReport: stringify(oldReport),
-                        action,
-                    },
-                );
+                const body = {
+                    embed:     stringify(await getEmbed(report, true)),
+                    report:    stringify(report),
+                    oldReport: stringify(oldReport),
+                    action,
+                };
+                if (process.env.DEBUG) {
+                    console.log(`Posting to ${subscription.url}`, body);
+                }
+                response   = await axios.post(subscription.url, body);
             } catch (e) {
                 console.log('Error Posting', e);
                 response = e.response;
