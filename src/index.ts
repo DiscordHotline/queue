@@ -1,7 +1,7 @@
 import {Channel, connect, Message as AMQPMessage} from 'amqplib';
 import {AxiosInstance, default as axios} from 'axios';
 import * as hookcord from 'hookcord';
-import {parse, stringify} from 'flatted'
+import {stringify, parse} from 'flatted';
 import * as moment from 'moment';
 
 import * as interfaces from './interfaces';
