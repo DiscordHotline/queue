@@ -85,12 +85,14 @@ async function onMessage(message: interfaces.Message): Promise<boolean> {
         case 'EDIT_REPORT':
         case 'NEW_REPORT':
         case 'DELETE_REPORT':
-            const data   = message.data as interfaces.ReportData;
-            const report = data.report as interfaces.Report;
+            const data      = message.data as interfaces.ReportData;
+            const report    = data.report as interfaces.Report;
+            const oldReport = data.oldReport as interfaces.Report;
 
             return await handleReport(
                 typeToAction[message.type],
                 report,
+                oldReport,
                 data.subscription,
                 data.attempt,
             );
@@ -115,6 +117,7 @@ async function onMessage(message: interfaces.Message): Promise<boolean> {
 async function handleReport(
     action: interfaces.MessageAction,
     report: interfaces.Report,
+    oldReport: interfaces.Report,
     subscriptionId?: number,
     attempt: number = 0,
 ): Promise<boolean> {
@@ -162,8 +165,9 @@ async function handleReport(
                 response = await axios.post(
                     subscription.url,
                     {
-                        embed:  stringify(await getEmbed(report, true)),
-                        report: stringify(report),
+                        embed:     stringify(await getEmbed(report, true)),
+                        report:    stringify(report),
+                        oldReport: stringify(oldReport),
                         action,
                     },
                 );
@@ -179,14 +183,15 @@ async function handleReport(
                 `Received: ${response ? response.status : 0} Attempt: ${attempt}`,
                 subscription,
             );
-            const dataToSend = {
+            const dataToSend: { waitUntil: Date, type: string, data: interfaces.ReportData } = {
                 waitUntil: moment().add(5, 'm').toDate(),
                 type:      actionToType[action],
                 data:      {
-                               subscription: subscription.id,
-                               attempt:      attempt + 1,
-                               report,
-                           } as interfaces.SpecificSubscriptionReport,
+                    subscription: subscription.id,
+                    attempt:      attempt + 1,
+                    report,
+                    oldReport,
+                },
             };
             channel.publish('hotline-reports', 'report', Buffer.from(stringify(dataToSend)));
         } else {

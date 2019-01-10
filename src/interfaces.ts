@@ -28,6 +28,7 @@ export interface SpecificSubscriptionReport {
 export interface ReportData extends SpecificSubscriptionReport {
     id?: number;
     report: Report;
+    oldReport?: Report;
 }
 
 export interface User {
