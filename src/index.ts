@@ -1,6 +1,7 @@
 import {Channel, connect, Message as AMQPMessage} from 'amqplib';
 import {AxiosInstance, default as axios} from 'axios';
 import * as hookcord from 'hookcord';
+import {parse, stringify} from 'flatted'
 import * as moment from 'moment';
 
 import * as interfaces from './interfaces';
@@ -57,7 +58,7 @@ async function main(): Promise<void> {
 
     console.log('Consuming messages');
     await channel.consume('hotline-reports', async (msg: AMQPMessage) => {
-        const message: interfaces.Message = JSON.parse(msg.content.toString());
+        const message: interfaces.Message = parse(msg.content.toString());
         console.log(`Processing message: ${message.type} Delay: ${message.waitUntil}`);
         if (message.waitUntil && moment().isBefore(moment(message.waitUntil))) {
             console.log('Delaying');
@@ -163,8 +164,8 @@ async function handleReport(
                 response = await axios.post(
                     subscription.url,
                     {
-                        embed:  JSON.stringify(await getEmbed(report, true)),
-                        report: JSON.stringify(report),
+                        embed:  stringify(await getEmbed(report, true)),
+                        report: stringify(report),
                         action,
                     },
                 );
@@ -189,7 +190,7 @@ async function handleReport(
                                report,
                            } as interfaces.SpecificSubscriptionReport,
             };
-            channel.publish('hotline-reports', 'report', Buffer.from(JSON.stringify(dataToSend)));
+            channel.publish('hotline-reports', 'report', Buffer.from(stringify(dataToSend)));
         } else {
             console.log(`Subscription posted successfully. Subscription: ${subscription.id} Report: ${report.id}`);
         }
