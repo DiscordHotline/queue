@@ -29,11 +29,11 @@ type Secret = {
     username: string;
     password: string;
     port: string;
-}
+};
 
 async function main(): Promise<void> {
     const queue = (await secrets.getSecret<Secret>('hotline/queue')).value;
-    api                 = axios.create({
+    api         = axios.create({
         baseURL: process.env.API_URL || 'https://api.hotline.gg',
         headers: {
             'Authorization': 'Bearer ' + queue.api_key,
