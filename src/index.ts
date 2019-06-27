@@ -5,12 +5,12 @@ import * as hookcord from 'hookcord';
 import * as moment from 'moment';
 
 import * as interfaces from './interfaces';
-import {Vault} from './Vault';
+import getSecretManager from './util/getSecretManager';
 
-let vault: Vault;
+const secrets = getSecretManager();
 let api: AxiosInstance;
 let channel: Channel;
-const cdn = 'https://cdn.discordapp.com';
+const cdn     = 'https://cdn.discordapp.com';
 
 const actionToType: { [key: string]: interfaces.MessageType }   = {
     new:    'NEW_REPORT',
@@ -23,17 +23,17 @@ const typeToAction: { [key: string]: interfaces.MessageAction } = {
     DELETE_REPORT: 'delete',
 };
 
-async function main(): Promise<void> {
-    vault = new Vault({
-        address:   process.env.VAULT_ADDR,
-        roleId:    process.env.VAULT_ROLE_ID,
-        secretId:  process.env.VAULT_SECRET_ID,
-        vaultFile: process.env.VAULT_FILE,
-    });
-    await vault.initialize();
+type Secret = {
+    api_key: string;
+    host: string;
+    username: string;
+    password: string;
+    port: string;
+}
 
-    const queue = await vault.getSecrets('queue');
-    api         = axios.create({
+async function main(): Promise<void> {
+    const queue = (await secrets.getSecret<Secret>('hotline/queue')).value;
+    api                 = axios.create({
         baseURL: process.env.API_URL || 'https://api.hotline.gg',
         headers: {
             'Authorization': 'Bearer ' + queue.api_key,
@@ -175,7 +175,7 @@ async function handleReport(
                 if (process.env.DEBUG) {
                     console.log(`Posting to ${subscription.url}`, body);
                 }
-                response   = await axios.post(subscription.url, body);
+                response = await axios.post(subscription.url, body);
             } catch (e) {
                 console.log('Error Posting', e);
                 response = e.response;
@@ -226,8 +226,8 @@ async function getEmbed(report: interfaces.Report, webhook: boolean = false): Pr
     }
 
     let footerText = webhook
-                     ? null
-                     : `Confirmations: ${report.confirmationUsers.length} | Last Edit: ${moment(report.updateDate)
+        ? null
+        : `Confirmations: ${report.confirmationUsers.length} | Last Edit: ${moment(report.updateDate)
             .from(moment())}`;
 
     const embed = {

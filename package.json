@@ -12,26 +12,28 @@
     "author": "Aaron Scherer <aequasi@gmail.com>, Arunesh <arunesh90@outlook.com>",
     "private": true,
     "devDependencies": {
-        "@types/amqplib": "^0.5.9",
-        "@types/dotenv": "^6.1.0",
-        "@types/node": "^10.12.18",
-        "@types/node-vault": "^0.5.3",
-        "@types/source-map-support": "^0.4.1",
-        "nodemon": "^1.18.9",
+        "@secretary/json-file-adapter": "^2.0.2",
+        "@types/amqplib": "^0.5.12",
+        "@types/dotenv": "^6.1.1",
+        "@types/node": "^10.14.10",
+        "@types/source-map-support": "^0.4.2",
+        "nodemon": "^1.19.1",
         "ts-lint": "^4.5.1",
         "ts-node": "^7.0.1",
-        "typescript": "^3.2.2"
+        "typescript": "^3.5.2"
     },
     "dependencies": {
+        "@secretary/aws-secrets-manager-adapter": "^2.0.2",
+        "@secretary/core": "^2.0.2",
         "amqplib": "^0.5.3",
-        "axios": "^0.18.0",
+        "aws-sdk": "^2.480.0",
+        "axios": "^0.18.1",
         "dotenv": "^6.2.0",
         "eris": "^0.9.0",
         "flatted": "^2.0.0",
-        "hookcord": "^2.0.0",
-        "moment": "^2.23.0",
-        "node-vault": "^0.9.5",
-        "reflect-metadata": "^0.1.12",
-        "source-map-support": "^0.5.9"
+        "hookcord": "^2.0.1",
+        "moment": "^2.24.0",
+        "reflect-metadata": "^0.1.13",
+        "source-map-support": "^0.5.12"
     }
 }
