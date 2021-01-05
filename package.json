@@ -27,7 +27,7 @@
         "@secretary/core": "^2.0.2",
         "amqplib": "^0.5.3",
         "aws-sdk": "^2.480.0",
-        "axios": "^0.18.1",
+        "axios": "^0.21.1",
         "dotenv": "^6.2.0",
         "eris": "^0.9.0",
         "flatted": "^2.0.0",
